@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alterar <%= product.name %> </title>
+</head>
+<body>
+    <h1>Modifica los tacos carnal.</h1>
+    <form action="/products/<%=product._id%>?_method=PUT" method="post">
+        <label for="name">Nombre del Taco:</label>
+        <input type="text" id="name" name="name" placeholder="nombra tu taco" 
+        value="<%= product.name %> ">
+        <label for="price">A cuantos varos el taco, joven.</label>
+        <input type="number" name="price" id="price" value="<%= product.price %>">
+        <label for="category">Tipo de Tortilla, joven</label>
+        <select name="category" id="category">
+            <% for (let category of categories){%>
+                <option value="<%=category%>" <%=product.category === category ? 'selected' : ''%>><%=category%></option>
+           <% } %>
+        </select>
+        <button>Guardar cambios en el sistema taquero municipal</button>
+    </form>
+
+    <a href="/products/<%=product._id%>">Rajarse</a>
+</body>
+</html>

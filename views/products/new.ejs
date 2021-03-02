@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tacos Nuevos</title>
+</head>
+<body>
+    <h1>Agrega otro tipo de tacos.</h1>
+    <form action="/products" method="post">
+        <label for="name">Nombre del Taco:</label>
+        <input type="text" id="name" name="name" placeholder="nombra tu taco">
+        <label for="price">A cuantos varos el taco, joven.</label>
+        <input type="number" name="price" id="price">
+        <label for="category">Tipo de Tortilla, joven</label>
+        <select name="category" id="category">
+            <% for (let category of categories){%>
+                <option value="<%=category%>"><%=category%></option>
+           <% } %>    
+        </select>
+        <button>Dar de alta en el sistema taquero municipal</button>
+    </form>
+    <img src="https://images.unsplash.com/photo-1599974579688-8dbdd335c77f?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1071&q=80" alt="">
+</body>
+</html>
