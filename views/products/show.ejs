@@ -14,5 +14,8 @@
     </ul>
     <a href="/products">Menú Principal</a>
     <a href="/products/<%=product._id%>/edit">Modificar información</a>
+    <form action="/products/<%=product._id%>?_method=DELETE" method="post">
+        <button>Eliminar del Menú.</button>
+    </form>
 </body>
 </html>
