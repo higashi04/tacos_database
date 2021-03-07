@@ -5,6 +5,12 @@ const mongoose = require('mongoose');
 const methodOverride = require('method-override');
 
 const Product = require('./models/product');
+const AppError = require('./AppError');
+
+const handleValidationErr = err => {
+    console.dir(err);
+    return new AppError(`La regaste Carnal!!!...${err.message}`, 400)
+}
 
 mongoose.connect('mongodb://localhost:27017/tacos', {useNewUrlParser: true, useUnifiedTopology: true})
     .then(()=> {
@@ -31,36 +37,66 @@ app.get('/products/new', (req, res) => {
     res.render('products/new', { categories })
 })
 
-app.post('/products', async (req, res) => {
+app.post('/products', async (req, res, next) => {
+    try {
     const newTaco = new Product(req.body);
     await newTaco.save();
     res.redirect(`/products/${newTaco._id}`)
-})
+    } catch(e) {
+        next(e);
+    }
+    
+});
 
-app.get('/products/:id', async (req, res) => {
+function wrapAsync(fn){
+    return function(req, res, next){
+        fn(req, res, next).catch(e => next(e))
+    }
+}
+
+app.get('/products/:id', wrapAsync(async (req, res, next) => {
     const { id } = req.params;
     const product = await Product.findById(id);
+    if(!product){
+       throw next(new AppError('Taco no existe', 404));
+    }
     res.render('products/show', { product })
-})
+}));
 
-app.get('/products/:id/edit', async (req, res) => {
+app.get('/products/:id/edit', wrapAsync(async (req, res, next) => {
     const { id } = req.params;
     const product = await Product.findById(id);
+    if(!product){
+        return next(new AppError('Taco no existe', 404));
+     }
     res.render('products/edit', { product, categories })
-})
+}))
 
-app.put('/products/:id', async (req, res) => {
-    const { id } = req.params;
-    const product = await Product.findByIdAndUpdate(id, req.body, { runValidators: true, new: true });
-    res.redirect(`/products/${product._id}`);
-})
+app.put('/products/:id', wrapAsync(async (req, res, next) => {
+        const { id } = req.params;
+        const product = await Product.findByIdAndUpdate(id, req.body, { runValidators: true, new: true });
+        res.redirect(`/products/${product._id}`);
+}));
+    
 
-app.delete('/products/:id', async (req, res) => {
+app.delete('/products/:id', wrapAsync(async (req, res) => {
     const { id } = req.params;
     await Product.findByIdAndDelete(id);
     res.redirect('/products')
+}));
+
+app.use((err, req, res, next) => {
+   if(err.name === 'ValidationError') {
+       err =handleValidationErr(err)
+   }
+   next(err);
 })
+
+app.use((err, req, res, next) => {
+   const { status = 500, message = 'you got an error! omg!' } = err;
+   res.status(status).send(message);
+});
 
 app.listen(3000, () => {
     console.log('they are always listening, on port 3000 btw')
-})
+});
